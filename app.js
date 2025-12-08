@@ -27,5 +27,8 @@ app.get("/", (req, res) => {
 });
 
 
-// Vercel gestionará el servidor automáticamente.
-module.exports = app;
+// Servidor (Render usa process.env.PORT)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+});
