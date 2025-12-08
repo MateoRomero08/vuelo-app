@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "origen": "Bogotá",
+        "destino": "Medellín",
+        "hora": "10:00",
+        "precio": 250000,
+        "estado": "A tiempo",
+        "asientos": 40
+    },
+    {
+        "id": 2,
+        "origen": "Bogotá",
+        "destino": "Cali",
+        "hora": "14:00",
+        "precio": 300000,
+        "estado": "Retrasado",
+        "asientos": 20
+    },
+    {
+        "id": 3,
+        "origen": "Medellín",
+        "destino": "Bogotá",
+        "hora": "09:00",
+        "precio": 260000,
+        "estado": "A tiempo",
+        "asientos": 15
+    }
+]

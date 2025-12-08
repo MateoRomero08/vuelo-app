@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reservar Vuelo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="with-background">
+    <div class="container">
+        <h1 style="color:#00ff88;">Reservar Vuelo</h1>
+
+        <form id="formReserva">
+            <label>ID del Vuelo:</label>
+            <input type="number" name="idVuelo" required>
+
+            <label>Cantidad de pasajeros:</label>
+            <input type="number" name="pasajeros" required>
+
+            <button class="btn" type="submit">Reservar</button>
+        </form>
+
+        <h2 style="color:#00ff88;">Resultado:</h2>
+        <div id="mensaje"></div>
+
+        <a class="btn" href="dashboard.html">Volver</a>
+    </div>
+
+    <script>
+        document.getElementById("formReserva").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const correo = localStorage.getItem("usuario");
+
+            const datos = {
+                usuario: correo,
+                idVuelo: e.target.idVuelo.value,
+                pasajeros: e.target.pasajeros.value
+            };
+
+            const respuesta = await fetch("/api/reservas", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await respuesta.json();
+            document.getElementById("mensaje").innerText = resultado.mensaje;
+        });
+    </script>
+
+    <script>
+        // Evitar que el usuario regrese con atrás
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = function () {
+            window.location.href = "index.html";
+        };
+
+        // Validar sesión
+        const usuario = localStorage.getItem("usuario");
+        if (!usuario) {
+            window.location.href = "index.html";
+        }
+    </script>
+
+</body>
+</html>

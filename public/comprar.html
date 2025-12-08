@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Comprar Billete</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+
+<script>
+    // Tiempo máximo de inactividad en milisegundos (15 minutos)
+    const MAX_INACTIVIDAD = 10000; // 900000 ms
+
+    let tiempoInactividad;
+
+    function reiniciarTiempo() {
+        clearTimeout(tiempoInactividad);
+        tiempoInactividad = setTimeout(() => {
+            alert("Sesión finalizada por inactividad.");
+            localStorage.removeItem("usuario");
+            window.location.href = "index.html";
+        }, MAX_INACTIVIDAD);
+    }
+
+    // Eventos que detectan actividad del usuario
+    window.onload = reiniciarTiempo;
+    document.onmousemove = reiniciarTiempo;
+    document.onkeypress = reiniciarTiempo;
+    document.onclick = reiniciarTiempo;
+    document.onscroll = reiniciarTiempo;
+</script>
+
+<body class="with-background">
+    <div class="container">
+        <h1 style="color:#00ff88;">Comprar Boleto</h1>
+
+        <form id="formCompra">
+            <label>ID de la Reserva:</label>
+            <input type="number" name="idReserva" required>
+
+            <label>Número de tarjeta (simulado):</label>
+            <input type="text" name="tarjeta" required>
+
+            <button class="btn" type="submit">Comprar</button>
+        </form>
+
+        <h2 style="color:#00ff88;">Resultado:</h2>
+        <div id="mensaje"></div>
+
+        <a class="btn" href="dashboard.html">Volver</a>
+    </div>
+
+    <script>
+        document.getElementById("formCompra").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const correo = localStorage.getItem("usuario");
+
+            const datos = {
+                usuario: correo,
+                idReserva: e.target.idReserva.value,
+                tarjeta: e.target.tarjeta.value
+            };
+
+            const respuesta = await fetch("/api/compras", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await respuesta.json();
+            document.getElementById("mensaje").innerText = resultado.mensaje;
+        });
+    </script>
+
+    
+
+    <script>
+    // Evitar que el usuario regrese a páginas privadas usando el botón atrás
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+        window.location.href = "index.html"; // Redirigir al login
+    };
+
+    // Verificar sesión activa
+    const usuario = localStorage.getItem("usuario");
+    if (!usuario) {
+        window.location.href = "index.html";
+    }
+    </script>
+
+</body>
+
+
+
+</html>

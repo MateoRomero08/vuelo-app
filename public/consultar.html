@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Consultar Vuelos</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+<body class="with-background">
+    <div class="container">
+        <h1 style="color:#00ff88;">Consultar Vuelos</h1>
+
+        <form id="formConsulta">
+            <label>Origen:</label>
+            <input type="text" name="origen" required>
+
+            <label>Destino:</label>
+            <input type="text" name="destino" required>
+
+            <button class="btn" type="submit">Buscar</button>
+        </form>
+
+        <h2 style="color:#00ff88;">Resultados:</h2>
+        <div id="resultados" class="table-container"></div>
+
+        <a class="btn" href="dashboard.html">Volver</a>
+    </div>
+
+    <script>
+    document.getElementById("formConsulta").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const datos = {
+            origen: e.target.origen.value,
+            destino: e.target.destino.value
+        };
+
+        const respuesta = await fetch("/api/vuelos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
+        });
+
+        const vuelos = await respuesta.json();
+
+        let html = "";
+
+        if (vuelos.length > 0) {
+            html += `
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Asientos</th>
+                    </tr>
+            `;
+
+            vuelos.forEach(v => {
+                html += `
+                    <tr>
+                        <td>${v.id}</td>
+                        <td>${v.hora}</td>
+                        <td>$${v.precio}</td>
+                        <td>${v.estado}</td>
+                        <td>${v.asientos}</td>
+                    </tr>
+                `;
+            });
+
+            html += "</table>";
+        } else {
+            html = "<p>No se encontraron vuelos para esos criterios.</p>";
+        }
+
+        document.getElementById("resultados").innerHTML = html;
+    });
+    </script>
+    
+
+    <script>
+    // Evitar que el usuario regrese a páginas privadas usando el botón atrás
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+        window.location.href = "index.html"; // Redirigir al login
+    };
+
+    // Verificar sesión activa
+    const usuario = localStorage.getItem("usuario");
+    if (!usuario) {
+        window.location.href = "index.html";
+    }
+    </script>
+
+</body>
+
+
+
+</html>

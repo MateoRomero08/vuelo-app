@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Sistema de Vuelos</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body class="with-background">
+    <div class="container">
+        <h1 style="color:#00ff88;">Sistema de Reservas de Vuelos</h1>
+        <h2>Iniciar Sesión</h2>
+
+        <form id="formLogin">
+
+            <label>Correo:</label>
+            <input type="email" name="correo" required>
+
+            <label>Contraseña:</label>
+            <input type="password" name="password" required>
+
+            <button class="btn" type="submit">Ingresar</button>
+        </form>
+
+        <a class="btn" href="registro.html">¿No tienes cuenta? Regístrate aquí</a>
+    </div>
+
+    <script>
+        document.getElementById("formLogin").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const datos = {
+                correo: e.target.correo.value,
+                password: e.target.password.value
+            };
+
+            const respuesta = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await respuesta.json();
+            alert(resultado.mensaje);
+
+            if (resultado.ok) {
+                // Guardamos correo en localStorage para simular sesión
+                localStorage.setItem("usuario", datos.correo);
+                window.location.href = "dashboard.html";
+            }
+        });
+    </script>
+</body>
+</html>

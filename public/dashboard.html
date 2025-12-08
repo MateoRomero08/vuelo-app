@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body class="with-background">
+     <div class="dashboard">
+        <div class="titulo-logo">
+            <h1>Bienvenido al Sistema de Vuelos</h1>
+            <img src="logo.jpg" class="logo-intouch">
+        </div>
+
+
+        <div class="nav-buttons">
+            <a href="consultar.html">Consultar Vuelos</a>
+            <a href="reservar.html">Reservar Vuelo</a>
+            <a href="comprar.html">Comprar Boleto</a>
+            <a href="index.html" class="btn-danger" onclick="localStorage.removeItem('usuario')">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <script>
+        const correo = localStorage.getItem("usuario");
+        if (!correo) {
+            window.location.href = "index.html";
+        }
+
+        document.getElementById("usuarioMostrar").innerText = "Usuario: " + correo;
+
+        document.getElementById("logout").addEventListener("click", () => {
+            localStorage.removeItem("usuario");
+            window.location.href = "index.html";
+        });
+    </script>
+
+    <script>
+    console.log("Script cargado en dashboard");
+    </script>
+
+    <script>
+    // Evitar que el usuario regrese a páginas privadas usando el botón atrás
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+        window.location.href = "index.html"; // Redirigir al login
+    };
+
+    // Verificar sesión activa
+    const usuario = localStorage.getItem("usuario");
+    if (!usuario) {
+        window.location.href = "index.html";
+    }
+    </script>
+
+</body>
+
+</html>
