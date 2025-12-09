@@ -7,14 +7,5 @@
     "fechaReserva": "2025-12-09",
     "precio": 100,
     "estado": "cancelada"
-  },
-  {
-    "id": 2,
-    "usuario": "mat1234@example.com",
-    "vueloId": 13,
-    "pasajeros": 2,
-    "fechaReserva": "2025-12-09",
-    "precio": 100,
-    "estado": "cancelada"
   }
 ]

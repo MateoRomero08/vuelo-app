@@ -3,17 +3,16 @@ const fs = require("fs");
 const router = express.Router();
 
 router.post("/registrar", (req, res) => {
-    const { nombre, correo, password } = req.body;
+    const { correo, password } = req.body;
 
     const usuarios = JSON.parse(fs.readFileSync("usuarios.json"));
 
-    // Verificar si el correo ya existe
     const existe = usuarios.find(u => u.correo === correo);
     if (existe) {
         return res.json({ ok: false, mensaje: "El correo ya está registrado" });
     }
 
-    usuarios.push({ nombre, correo, password });
+    usuarios.push({ correo, password });
 
     fs.writeFileSync("usuarios.json", JSON.stringify(usuarios, null, 2));
 

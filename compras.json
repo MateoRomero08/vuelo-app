@@ -5,19 +5,5 @@
     "tarjeta": "SIMULADO",
     "fechaCompra": "2025-12-08T02:02:00.298Z",
     "precio": 250000
-  },
-  {
-    "usuario": "Mat1234@example.com",
-    "idReserva": "1",
-    "tarjeta": "SIMULADO",
-    "fechaCompra": "2025-12-08T03:08:55.470Z",
-    "precio": 250000
-  },
-  {
-    "usuario": "Mat1234@example.com",
-    "idReserva": "1",
-    "tarjeta": "SIMULADO",
-    "fechaCompra": "2025-12-09T01:50:43.202Z",
-    "precio": 250000
   }
 ]

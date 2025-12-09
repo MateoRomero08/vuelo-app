@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Registro de Usuario</title>
     <link rel="stylesheet" href="styles.css">
-
 </head>
 <body class="with-background">
     <div class="container">
@@ -29,16 +28,21 @@
         <div id="mensaje"></div>
     </div>
 
-
     <script>
         document.getElementById("formRegistro").addEventListener("submit", async function(e) {
             e.preventDefault();
 
-            const datos = {
-                nombre: e.target.nombre.value,
-                correo: e.target.correo.value,
-                password: e.target.password.value
-            };
+            const correo = e.target.correo.value;
+            const password = e.target.password.value;
+            const confirmar = e.target.confirmar.value;
+
+            // Validar contraseñas iguales
+            if (password !== confirmar) {
+                alert("Las contraseñas no coinciden");
+                return;
+            }
+
+            const datos = { correo, password };
 
             const respuesta = await fetch("/api/registrar", {
                 method: "POST",
