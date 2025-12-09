@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <title>Consultar Vuelos</title>
     <link rel="stylesheet" href="styles.css">
-
 </head>
-
-
 <body class="with-background">
     <div class="container">
         <h1 style="color:#00ff88;">Consultar Vuelos</h1>
@@ -19,6 +16,19 @@
             <label>Destino:</label>
             <input type="text" name="destino" required>
 
+            <label>Tipo de Consulta:</label>
+            <select id="tipoConsulta">
+                <option value="horario">Horarios</option>
+                <option value="tarifa">Tarifas</option>
+                <option value="info">Información</option>
+            </select>
+
+            <label>Orden:</label>
+            <select id="filtroSelect">
+                <option value="asc">Ascendente</option>
+                <option value="desc">Descendente</option>
+            </select>
+
             <button class="btn" type="submit">Buscar</button>
         </form>
 
@@ -29,49 +39,79 @@
     </div>
 
     <script>
+    let vuelos = [];
+
+    async function cargarVuelos() {
+        try {
+            const resp = await fetch('/api/vuelos');
+            vuelos = await resp.json();
+        } catch (e) {
+            console.error("Error cargando vuelos:", e);
+        }
+    }
+
+    cargarVuelos();
+
+    const tipoSelect = document.getElementById('tipoConsulta');
+    const filtroSelect = document.getElementById('filtroSelect');
+
+    const quitarAcentos = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     document.getElementById("formConsulta").addEventListener("submit", async function(e) {
         e.preventDefault();
 
-        const datos = {
-            origen: e.target.origen.value,
-            destino: e.target.destino.value
-        };
+        if (vuelos.length === 0) await cargarVuelos();
 
-        const respuesta = await fetch("/api/vuelos", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(datos)
-        });
+        const origen = e.target.origen.value.trim();
+        const destino = e.target.destino.value.trim();
+        const tipo = tipoSelect.value;
+        const orden = filtroSelect.value;
 
-        const vuelos = await respuesta.json();
+        let resultados = vuelos.filter(v =>
+            quitarAcentos(v.origen.toLowerCase()).includes(quitarAcentos(origen.toLowerCase())) &&
+            quitarAcentos(v.destino.toLowerCase()).includes(quitarAcentos(destino.toLowerCase()))
+        );
 
-        let html = "";
-
-        if (vuelos.length > 0) {
-            html += `
-                <table>
-                    <tr>
-                        <th>ID</th>
-                        <th>Hora</th>
-                        <th>Precio</th>
-                        <th>Estado</th>
-                        <th>Asientos</th>
-                    </tr>
-            `;
-
-            vuelos.forEach(v => {
-                html += `
-                    <tr>
-                        <td>${v.id}</td>
-                        <td>${v.hora}</td>
-                        <td>$${v.precio}</td>
-                        <td>${v.estado}</td>
-                        <td>${v.asientos}</td>
-                    </tr>
-                `;
+        if (tipo === 'tarifa') {
+            resultados.sort((a, b) => orden === 'asc' ? a.precio - b.precio : b.precio - a.precio);
+        } else if (tipo === 'horario') {
+            resultados.sort((a, b) => {
+                const ha = a.hora.split(':').map(Number);
+                const hb = b.hora.split(':').map(Number);
+                return orden === 'asc'
+                    ? (ha[0]*60 + ha[1]) - (hb[0]*60 + hb[1])
+                    : (hb[0]*60 + hb[1]) - (ha[0]*60 + ha[1]);
             });
+        } else if (tipo === 'info') {
+            resultados.sort((a, b) => orden === 'asc' ? a.asientos - b.asientos : b.asientos - a.asientos);
+        }
 
-            html += "</table>";
+        let html = '';
+        if (resultados.length > 0) {
+            html += `<table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Asientos</th>
+                        </tr>`;
+            resultados.forEach(v => {
+                html += `<tr>
+                            <td>${v.id}</td>
+                            <td>${v.origen}</td>
+                            <td>${v.destino}</td>
+                            <td>${v.fecha}</td>
+                            <td>${v.hora}</td>
+                            <td>$${v.precio}</td>
+                            <td>${v.estado}</td>
+                            <td>${v.asientos}</td>
+                        </tr>`;
+            });
+            html += `</table>`;
         } else {
             html = "<p>No se encontraron vuelos para esos criterios.</p>";
         }
@@ -79,24 +119,5 @@
         document.getElementById("resultados").innerHTML = html;
     });
     </script>
-    
-
-    <script>
-    // Evitar que el usuario regrese a páginas privadas usando el botón atrás
-    window.history.pushState(null, "", window.location.href);
-    window.onpopstate = function () {
-        window.location.href = "index.html"; // Redirigir al login
-    };
-
-    // Verificar sesión activa
-    const usuario = localStorage.getItem("usuario");
-    if (!usuario) {
-        window.location.href = "index.html";
-    }
-    </script>
-
 </body>
-
-
-
 </html>

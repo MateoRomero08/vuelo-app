@@ -12,8 +12,8 @@ app.use("/api", authRoutes);
 const vuelosRoutes = require("./routes/vuelos");
 app.use("/api/vuelos", vuelosRoutes);
 
-const reservasRoutes = require("./routes/reservas");
-app.use("/api/reservas", reservasRoutes);
+const reservasRouter = require('./routes/reservas');
+app.use('/api/reservas', reservasRouter);
 
 const comprasRoutes = require("./routes/compras");
 app.use("/api/compras", comprasRoutes);

@@ -10,6 +10,7 @@
     <div class="container">
         <h1 style="color:#00ff88;">Reservar Vuelo</h1>
 
+        <!-- Formulario para reservar -->
         <form id="formReserva">
             <label>ID del Vuelo:</label>
             <input type="number" name="idVuelo" required>
@@ -23,30 +24,117 @@
         <h2 style="color:#00ff88;">Resultado:</h2>
         <div id="mensaje"></div>
 
+        <!-- Botón para mostrar reservas -->
+        <button class="btn" id="verReservasBtn">Ver Mis Reservas</button>
+
+        <!-- Contenedor de reservas oculto -->
+        <div id="misReservas" style="display:none; margin-top:20px;">
+            <h2 style="color:#00ff88;">Mis Reservas</h2>
+            <div id="reservasContainer" class="table-container"></div>
+        </div>
+
         <a class="btn" href="dashboard.html">Volver</a>
     </div>
 
     <script>
-        document.getElementById("formReserva").addEventListener("submit", async function(e) {
-            e.preventDefault();
+    const usuario = localStorage.getItem("usuario");
+    if (!usuario) window.location.href = "index.html";
 
-            const correo = localStorage.getItem("usuario");
+    // Reservar vuelo
+    document.getElementById("formReserva").addEventListener("submit", async function(e) {
+        e.preventDefault();
+        const datos = {
+            usuario: localStorage.getItem("usuario").toLowerCase(),
+            idVuelo: e.target.idVuelo.value,
+            pasajeros: e.target.pasajeros.value
+        };
 
-            const datos = {
-                usuario: correo,
-                idVuelo: e.target.idVuelo.value,
-                pasajeros: e.target.pasajeros.value
-            };
-
-            const respuesta = await fetch("/api/reservas", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(datos)
-            });
-
-            const resultado = await respuesta.json();
-            document.getElementById("mensaje").innerText = resultado.mensaje;
+        const respuesta = await fetch("/api/reservas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datos)
         });
+
+        const resultado = await respuesta.json();
+        document.getElementById("mensaje").innerText = resultado.mensaje;
+
+        // Actualizar reservas si ya está visible
+        if (document.getElementById('misReservas').style.display === 'block') {
+            cargarReservas();
+        }
+    });
+
+    // Mostrar/ocultar reservas
+    const verReservasBtn = document.getElementById('verReservasBtn');
+    const misReservasDiv = document.getElementById('misReservas');
+    verReservasBtn.addEventListener('click', () => {
+        misReservasDiv.style.display = misReservasDiv.style.display === 'none' ? 'block' : 'none';
+        if (misReservasDiv.style.display === 'block') cargarReservas();
+    });
+
+    // Cargar reservas del usuario
+    async function cargarReservas() {
+        const resp = await fetch(`/api/reservas/${usuario}`);
+        const reservas = await resp.json();
+
+        const vuelosResp = await fetch('/api/vuelos');
+        const vuelos = await vuelosResp.json();
+
+        let html = '';
+        if (reservas.length > 0) {
+            html += `<table>
+                        <tr>
+                            <th>ID Reserva</th>
+                            <th>Vuelo</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Precio</th>
+                            <th>Acción</th>
+                        </tr>`;
+            reservas.forEach(r => {
+                const vuelo = vuelos.find(v => v.id == r.vueloId);
+                if (vuelo) {
+                    html += `<tr>
+                                <td>${r.id}</td>
+                                <td>${vuelo.id}</td>
+                                <td>${vuelo.origen}</td>
+                                <td>${vuelo.destino}</td>
+                                <td>${vuelo.fecha}</td>
+                                <td>${vuelo.hora}</td>
+                                <td>$${vuelo.precio}</td>
+                                <td><button onclick="confirmarCancelar(${r.id})">Cancelar</button></td>
+                             </tr>`;
+                }
+            });
+            html += `</table>`;
+        } else {
+            html = '<p>No tienes reservas activas.</p>';
+        }
+
+        document.getElementById('reservasContainer').innerHTML = html;
+    }
+
+    // Confirmación antes de cancelar
+    function confirmarCancelar(reservaId) {
+        if (confirm("¿Estás seguro de que deseas cancelar esta reserva?")) {
+            cancelar(reservaId);
+        }
+    }
+
+    // Cancelar reserva
+    async function cancelar(reservaId) {
+        const resp = await fetch('/api/reservas/cancelar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuario, reservaId })
+        });
+        const data = await resp.json();
+        alert(data.mensaje);
+        cargarReservas();
+    }
+
     </script>
 
     <script>
@@ -55,13 +143,8 @@
         window.onpopstate = function () {
             window.location.href = "index.html";
         };
-
-        // Validar sesión
-        const usuario = localStorage.getItem("usuario");
-        if (!usuario) {
-            window.location.href = "index.html";
-        }
     </script>
 
 </body>
 </html>
+

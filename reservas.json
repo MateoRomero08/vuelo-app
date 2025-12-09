@@ -1,18 +1,20 @@
 [
   {
-    "usuario": "Mat1234@example.com",
-    "idVuelo": 1,
-    "fecha": "2025-12-09",
-    "precio": 250000
+    "id": 1,
+    "usuario": "mat1234@example.com",
+    "vueloId": 1,
+    "pasajeros": 2,
+    "fechaReserva": "2025-12-09",
+    "precio": 100,
+    "estado": "cancelada"
   },
   {
-    "usuario": "Mat1234@example.com",
-    "idVuelo": 1,
-    "precio": 250000
-  },
-  {
-    "usuario": "Mat1234@example.com",
-    "idVuelo": 2,
-    "precio": 300000
+    "id": 2,
+    "usuario": "mat1234@example.com",
+    "vueloId": 13,
+    "pasajeros": 2,
+    "fechaReserva": "2025-12-09",
+    "precio": 100,
+    "estado": "cancelada"
   }
 ]
